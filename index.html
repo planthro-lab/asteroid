@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asteroid Map</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header id="header">
+    <div id="logo">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#fff" stroke-width="1.5"/>
+        <ellipse cx="14" cy="14" rx="13" ry="5" stroke="#fff" stroke-width="1" stroke-dasharray="3 2"/>
+        <circle cx="14" cy="14" r="3" fill="#fff"/>
+      </svg>
+      <span>ASTEROID MAP</span>
+    </div>
+    <div id="stats-bar">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-neo">—</span>
+        <span class="stat-label">Near-Earth Objects</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-pha">—</span>
+        <span class="stat-label">Potentially Hazardous</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-close">—</span>
+        <span class="stat-label">Close Approaches (30d)</span>
+      </div>
+    </div>
+    <div id="header-controls">
+      <button class="icon-btn" id="btn-info" title="About">?</button>
+    </div>
+  </header>
+
+  <!-- Main canvas -->
+  <canvas id="canvas"></canvas>
+
+  <!-- Left panel: search & filter -->
+  <aside id="left-panel">
+    <div id="search-box">
+      <input type="text" id="search-input" placeholder="Search asteroids..." />
+      <button id="search-btn">&#9906;</button>
+    </div>
+    <div id="filter-section">
+      <div class="filter-title">FILTER</div>
+      <label class="filter-row">
+        <input type="checkbox" id="filter-pha" checked />
+        <span class="dot red"></span> Potentially Hazardous
+      </label>
+      <label class="filter-row">
+        <input type="checkbox" id="filter-safe" checked />
+        <span class="dot green"></span> Non-Hazardous
+      </label>
+      <label class="filter-row">
+        <input type="checkbox" id="filter-close" checked />
+        <span class="dot yellow"></span> Close Approach (30d)
+      </label>
+    </div>
+    <div id="legend-section">
+      <div class="filter-title">SIZE</div>
+      <div class="size-legend">
+        <div class="size-row"><span class="size-dot s1"></span><span>&lt; 100m</span></div>
+        <div class="size-row"><span class="size-dot s2"></span><span>100m – 1km</span></div>
+        <div class="size-row"><span class="size-dot s3"></span><span>&gt; 1km</span></div>
+      </div>
+    </div>
+    <div id="asteroid-list">
+      <div class="filter-title">ASTEROIDS <span id="list-count"></span></div>
+      <ul id="asteroid-ul"></ul>
+    </div>
+  </aside>
+
+  <!-- Right panel: info -->
+  <aside id="right-panel" class="hidden">
+    <button id="close-info">✕</button>
+    <div id="info-name"></div>
+    <div id="info-designation"></div>
+    <div class="info-section">
+      <div class="info-row"><span class="info-label">Diameter</span><span class="info-value" id="info-diam"></span></div>
+      <div class="info-row"><span class="info-label">Hazardous</span><span class="info-value" id="info-haz"></span></div>
+      <div class="info-row"><span class="info-label">Semi-Major Axis</span><span class="info-value" id="info-sma"></span></div>
+      <div class="info-row"><span class="info-label">Eccentricity</span><span class="info-value" id="info-ecc"></span></div>
+      <div class="info-row"><span class="info-label">Inclination</span><span class="info-value" id="info-inc"></span></div>
+      <div class="info-row"><span class="info-label">Orbital Period</span><span class="info-value" id="info-period"></span></div>
+      <div class="info-row"><span class="info-label">Absolute Mag</span><span class="info-value" id="info-mag"></span></div>
+    </div>
+    <div id="close-approach-section" class="hidden">
+      <div class="filter-title">CLOSE APPROACHES</div>
+      <ul id="approach-list"></ul>
+    </div>
+    <a id="info-nasa-link" href="#" target="_blank" rel="noopener">View on NASA JPL ›</a>
+  </aside>
+
+  <!-- Bottom: date controls -->
+  <div id="bottom-bar">
+    <div id="time-controls">
+      <button class="time-btn" id="btn-slower" title="Slower">«</button>
+      <button class="time-btn" id="btn-pause" title="Pause/Play">⏸</button>
+      <button class="time-btn" id="btn-faster" title="Faster">»</button>
+      <button class="time-btn" id="btn-reset" title="Today">Today</button>
+    </div>
+    <div id="date-display">
+      <span id="current-date-label"></span>
+    </div>
+    <input type="range" id="date-slider" min="-365" max="365" value="0" step="1" />
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loading">
+    <div id="loading-inner">
+      <div class="spinner"></div>
+      <div id="loading-text">Loading asteroid data...</div>
+    </div>
+  </div>
+
+  <!-- About modal -->
+  <div id="about-modal" class="hidden">
+    <div id="about-content">
+      <button id="close-about">✕</button>
+      <h2>Asteroid Map</h2>
+      <p>An interactive 3D visualization of Near-Earth Objects (NEOs) using real-time data from NASA's Center for Near Earth Object Studies (CNEOS).</p>
+      <p>Data provided by <strong>NASA NeoWs API</strong>. Orbital mechanics computed from Keplerian elements.</p>
+      <ul>
+        <li><strong>Drag</strong> — rotate the view</li>
+        <li><strong>Scroll</strong> — zoom in/out</li>
+        <li><strong>Click</strong> — select an object</li>
+        <li><strong>Right-drag</strong> — pan</li>
+      </ul>
+      <button id="close-about-btn" class="primary-btn">Got it</button>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.165.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.165.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
