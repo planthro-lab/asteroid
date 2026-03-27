@@ -16,6 +16,7 @@ let simSpeed = 1;          // days/frame
 let paused = false;
 let filterPHA = true, filterSafe = true, filterClose = true;
 let closeApproachIds = new Set();
+let isDemoMode = false;
 
 // ─── Three.js Setup ──────────────────────────────────────────────────────────
 const canvas = document.getElementById('canvas');
@@ -505,6 +506,9 @@ async function fetchNEOs() {
 
   } catch (err) {
     loadingText.textContent = `Error: ${err.message}. Using demo data.`;
+    isDemoMode = true;
+    document.getElementById('btn-demo').classList.add('active');
+    document.getElementById('demo-badge').classList.add('visible');
     loadDemoData();
     setTimeout(() => {
       loading.classList.add('fade-out');
@@ -557,6 +561,46 @@ function loadDemoData() {
   }
   applyFilters();
 }
+
+// ─── Clear scene asteroids ───────────────────────────────────────────────
+function clearAsteroids() {
+  Object.values(meshes).forEach(obj => {
+    scene.remove(obj.mesh);
+    scene.remove(obj.orbitLine);
+    obj.mesh.geometry.dispose();
+    obj.mesh.material.dispose();
+    obj.orbitLine.geometry.dispose();
+    obj.orbitLine.material.dispose();
+  });
+  meshes = {};
+  asteroids = [];
+  closeApproachIds.clear();
+  selectedId = null;
+  selectionGroup.visible = false;
+  document.getElementById('right-panel').classList.add('hidden');
+}
+
+// ─── Demo mode toggle ────────────────────────────────────────────────────
+document.getElementById('btn-demo').addEventListener('click', () => {
+  if (isDemoMode) {
+    // Switch back to live data
+    isDemoMode = false;
+    document.getElementById('btn-demo').classList.remove('active');
+    document.getElementById('demo-badge').classList.remove('visible');
+    clearAsteroids();
+    const loading = document.getElementById('loading');
+    loading.style.display = '';
+    loading.classList.remove('fade-out');
+    fetchNEOs();
+  } else {
+    // Switch to demo mode
+    isDemoMode = true;
+    document.getElementById('btn-demo').classList.add('active');
+    document.getElementById('demo-badge').classList.add('visible');
+    clearAsteroids();
+    loadDemoData();
+  }
+});
 
 // ─── Date slider ──────────────────────────────────────────────────────────────
 const slider = document.getElementById('date-slider');
