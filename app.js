@@ -388,6 +388,11 @@ function selectAsteroid(id) {
   selectionGroup.visible = true;
   updateSelectionIndicator(baseSize, color);
 
+  // Close mobile menu when selecting an asteroid
+  document.body.classList.remove('menu-open');
+  const overlay = document.getElementById('menu-overlay');
+  if (overlay) overlay.classList.add('hidden');
+
   // Update right panel
   const panel = document.getElementById('right-panel');
   panel.classList.remove('hidden');
@@ -656,6 +661,17 @@ document.getElementById('close-about').addEventListener('click', () => {
 document.getElementById('close-about-btn').addEventListener('click', () => {
   document.getElementById('about-modal').classList.add('hidden');
 });
+
+// ─── Mobile Menu Toggle ──────────────────────────────────────────────────────
+const menuBtn = document.getElementById('btn-menu');
+const menuOverlay = document.getElementById('menu-overlay');
+
+function toggleMenu() {
+  document.body.classList.toggle('menu-open');
+  menuOverlay.classList.toggle('hidden');
+}
+menuBtn.addEventListener('click', toggleMenu);
+menuOverlay.addEventListener('click', toggleMenu);
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 window.addEventListener('resize', () => {

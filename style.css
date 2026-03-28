@@ -385,6 +385,75 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 
+/* Mobile menu button (hidden on desktop) */
+#btn-menu { display: none; }
+
+/* Menu overlay */
+#menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,10,0.6);
+  z-index: 85;
+  transition: opacity 0.3s ease;
+}
+#menu-overlay.hidden { display: none; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  :root { --panel-w: 280px; }
+
+  #btn-menu { display: flex; align-items: center; justify-content: center; }
+
+  /* Hamburger animation */
+  #btn-menu .bar1, #btn-menu .bar2, #btn-menu .bar3 {
+    transition: transform 0.3s ease, opacity 0.2s ease;
+    transform-origin: center;
+  }
+  body.menu-open #btn-menu .bar1 { transform: translate(0, 5px) rotate(45deg); }
+  body.menu-open #btn-menu .bar2 { opacity: 0; }
+  body.menu-open #btn-menu .bar3 { transform: translate(0, -5px) rotate(-45deg); }
+
+  /* Hide stats on mobile header */
+  #stats-bar { display: none; }
+
+  /* Left panel: off-screen by default */
+  #left-panel {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  body.menu-open #left-panel { transform: translateX(0); }
+
+  /* Right panel full width on mobile */
+  #right-panel {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  /* Bottom bar: extend full width */
+  #bottom-bar {
+    left: 0;
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  #date-display { min-width: auto; font-size: 12px; }
+  #date-slider { min-width: 0; }
+
+  /* Smaller time buttons */
+  .time-btn { padding: 4px 8px; font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+  :root { --panel-w: 100vw; }
+
+  #right-panel { max-width: 100%; }
+
+  #bottom-bar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 6px; }
+  #time-controls { order: 1; }
+  #date-display { order: 2; }
+  #date-slider { order: 3; width: 100%; flex-basis: 100%; }
+}
+
 /* Tooltip */
 #tooltip {
   position: fixed;
